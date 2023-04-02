@@ -62,6 +62,15 @@ public:
 
         return viewMatrix;
     }
+
+    static void lookAround(const float yaw, const float pitch)
+    {
+        glm::vec3 direction;
+
+        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        direction.y = sin(glm::radians(pitch));
+        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    }
 };
 
 } // namespace glimac

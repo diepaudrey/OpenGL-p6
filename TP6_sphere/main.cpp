@@ -1,5 +1,7 @@
 
+
 #include "cstddef"
+#include "glimac/Freefly.hpp"
 #include "glimac/Trackball.hpp"
 #include "glimac/common.hpp"
 #include "glimac/cone_vertices.hpp"
@@ -18,8 +20,12 @@ int main()
     ctx.maximize_window();
 
     /*Camera*/
-    glimac::TrackballCamera camera;
-    float                   movementStrength = 10.f;
+    // glimac::TrackballCamera camera;
+    glimac::FreeflyCamera camera;
+    float                 movementStrength = 10.f;
+
+    /*Test Camera Third person*/
+    // glfwSetInputMode(ctx, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // not working
     // Input input(camera, movementStrength);
@@ -29,6 +35,12 @@ int main()
 
         camera.rotateLeft(data.delta.x * movementStrength);
         camera.rotateUp(-data.delta.y * movementStrength);
+        // float yaw   = 0;
+        // float pitch = 0;
+
+        // yaw += data.delta.x * movementStrength;
+        // pitch += data.delta.y * movementStrength;
+        // camera.lookAround(yaw, pitch);
     };
 
     ctx.mouse_scrolled = [&camera](p6::MouseScroll data) {
@@ -44,6 +56,16 @@ int main()
         if (data.logical == "s" || data.logical == "S")
         {
             camera.moveFront(-ctx.delta_time() * movementStrength);
+        }
+
+        if (data.logical == "q" || data.logical == "Q")
+        {
+            camera.moveLeft(ctx.delta_time() * movementStrength);
+        }
+
+        if (data.logical == "d" || data.logical == "D")
+        {
+            camera.moveLeft(-ctx.delta_time() * movementStrength);
         }
     };
 
@@ -94,8 +116,7 @@ int main()
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
-        glm::mat4 viewMatrix = camera.getViewMatrix();
-
+        glm::mat4 viewMatrix   = camera.getViewMatrix();
         glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -5.0f));
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
