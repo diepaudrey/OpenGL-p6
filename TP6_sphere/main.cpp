@@ -23,6 +23,7 @@ int main()
     // glimac::TrackballCamera camera;
     glimac::FreeflyCamera camera;
     float                 movementStrength = 10.f;
+    float                 rotationStrength = 20.f;
 
     /*Test Camera Third person*/
     // glfwSetInputMode(ctx, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -30,17 +31,11 @@ int main()
     // not working
     // Input input(camera, movementStrength);
 
-    ctx.mouse_dragged = [&camera, &movementStrength](p6::MouseDrag data) {
+    ctx.mouse_dragged = [&camera, &rotationStrength](p6::MouseDrag data) {
         data.delta = data.position - data.start_position;
 
-        camera.rotateLeft(data.delta.x * movementStrength);
-        camera.rotateUp(-data.delta.y * movementStrength);
-        // float yaw   = 0;
-        // float pitch = 0;
-
-        // yaw += data.delta.x * movementStrength;
-        // pitch += data.delta.y * movementStrength;
-        // camera.lookAround(yaw, pitch);
+        camera.rotateLeft(data.delta.x * rotationStrength);
+        camera.rotateUp(data.delta.y * rotationStrength);
     };
 
     ctx.mouse_scrolled = [&camera](p6::MouseScroll data) {
@@ -126,7 +121,8 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUniformMatrix4fv(uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * viewMatrix));
+        glm::mat4 MVPMatrix = ProjMatrix * viewMatrix * MVMatrix;
+        glUniformMatrix4fv(uMVPMatrix, 1, GL_FALSE, glm::value_ptr(MVPMatrix));
 
         glUniformMatrix4fv(uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
 
