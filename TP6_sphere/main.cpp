@@ -14,6 +14,39 @@
 #include "input.hpp"
 #include "p6/p6.h"
 
+void mouseEvent(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& mvtStrength)
+{
+    ctx.mouse_dragged = [&](p6::MouseDrag data) {
+        data.delta = data.position - data.start_position;
+        (camera).rotateLeft(data.delta.x * mvtStrength);
+        (camera).rotateUp(-data.delta.y * mvtStrength);
+    };
+}
+
+void keyboardEvent(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& mvtStrength)
+{
+    ctx.key_repeated = [&](const p6::Key& data) {
+        if (data.logical == "z" || data.logical == "Z")
+        {
+            camera.moveFront(ctx.delta_time() * mvtStrength);
+        }
+
+        if (data.logical == "s" || data.logical == "S")
+        {
+            camera.moveFront(-ctx.delta_time() * mvtStrength);
+        }
+        if (data.logical == "q" || data.logical == "Q")
+        {
+            camera.moveLeft(ctx.delta_time() * mvtStrength);
+        }
+
+        if (data.logical == "d" || data.logical == "D")
+        {
+            camera.moveLeft(-ctx.delta_time() * mvtStrength);
+        }
+    };
+}
+
 int main()
 {
     auto ctx = p6::Context{{1280, 720, "TP3 EX1"}};
@@ -26,43 +59,46 @@ int main()
     float                 rotationStrength = 20.f;
 
     /*Test Camera Third person*/
-    // glfwSetInputMode(ctx, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(ctx.underlying_glfw_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // not working
-    // Input input(camera, movementStrength);
+    Input input(camera, movementStrength);
 
-    ctx.mouse_dragged = [&camera, &rotationStrength](p6::MouseDrag data) {
-        data.delta = data.position - data.start_position;
+    mouseEvent(ctx, camera, rotationStrength);
+    keyboardEvent(ctx, camera, movementStrength);
 
-        camera.rotateLeft(data.delta.x * rotationStrength);
-        camera.rotateUp(data.delta.y * rotationStrength);
-    };
+    // ctx.mouse_dragged = [&camera, &rotationStrength](p6::MouseDrag data) {
+    //     data.delta = data.position - data.start_position;
 
-    ctx.mouse_scrolled = [&camera](p6::MouseScroll data) {
-        camera.moveFront(data.dy);
-    };
+    //     camera.rotateLeft(data.delta.x * rotationStrength);
+    //     camera.rotateUp(data.delta.y * rotationStrength);
+    // };
 
-    ctx.key_repeated = [&camera, &ctx, &movementStrength](const p6::Key& data) {
-        if (data.logical == "z" || data.logical == "Z")
-        {
-            camera.moveFront(ctx.delta_time() * movementStrength);
-        }
+    // ctx.mouse_scrolled = [&camera](p6::MouseScroll data) {
+    //     camera.moveFront(data.dy);
+    // };
 
-        if (data.logical == "s" || data.logical == "S")
-        {
-            camera.moveFront(-ctx.delta_time() * movementStrength);
-        }
+    // ctx.key_repeated = [&camera, &ctx, &movementStrength](const p6::Key& data) {
+    //     if (data.logical == "z" || data.logical == "Z")
+    //     {
+    //         camera.moveFront(ctx.delta_time() * movementStrength);
+    //     }
 
-        if (data.logical == "q" || data.logical == "Q")
-        {
-            camera.moveLeft(ctx.delta_time() * movementStrength);
-        }
+    //     if (data.logical == "s" || data.logical == "S")
+    //     {
+    //         camera.moveFront(-ctx.delta_time() * movementStrength);
+    //     }
 
-        if (data.logical == "d" || data.logical == "D")
-        {
-            camera.moveLeft(-ctx.delta_time() * movementStrength);
-        }
-    };
+    //     if (data.logical == "q" || data.logical == "Q")
+    //     {
+    //         camera.moveLeft(ctx.delta_time() * movementStrength);
+    //     }
+
+    //     if (data.logical == "d" || data.logical == "D")
+    //     {
+    //         camera.moveLeft(-ctx.delta_time() * movementStrength);
+    //     }
+    // };
 
     /*VBO*/
     GLuint vbo;
@@ -111,6 +147,11 @@ int main()
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
+        /*Events*/
+
+        std::cout << camera.m_theta << std::endl;
+        std::cout << camera.m_phi << std::endl;
+
         glm::mat4 viewMatrix   = camera.getViewMatrix();
         glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -5.0f));

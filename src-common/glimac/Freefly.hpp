@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/scalar_constants.hpp"
@@ -9,7 +10,7 @@
 namespace glimac {
 
 class FreeflyCamera {
-private:
+public:
     glm::vec3 m_position;
     float     m_phi;
     float     m_theta;

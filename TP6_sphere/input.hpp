@@ -1,19 +1,22 @@
 #pragma once
+#include "glimac/Freefly.hpp"
 #include "glimac/Trackball.hpp"
 #include "p6/p6.h"
 
 class Input {
 private:
-    glimac::TrackballCamera m_camera;
-    float                   m_movementStrength;
+    glimac::FreeflyCamera m_camera;
+    float                 m_movementStrength;
 
 public:
-    Input(const glimac::TrackballCamera& cam, const float& mvtStrength)
+    Input(const glimac::FreeflyCamera cam, const float& mvtStrength)
         : m_camera(cam), m_movementStrength(mvtStrength){};
 
     void mouseHandler(p6::Context& ctx)
     {
         ctx.mouse_dragged = [&](p6::MouseDrag data) {
+            // std::cout << "data : " << data.position.x << std::endl;
+
             data.delta = data.position - data.start_position;
 
             m_camera.rotateLeft(data.delta.x * m_movementStrength);
