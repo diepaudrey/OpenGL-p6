@@ -14,17 +14,17 @@
 #include "input.hpp"
 #include "p6/p6.h"
 
-void mouseEvent(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& strength)
+void eventHandler(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& mvtStrength, const float& rotationStrength)
 {
     glfwSetInputMode(ctx.underlying_glfw_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    ctx.mouse_moved = [&](p6::MouseMove data) {
-        (camera).rotateLeft(data.delta.x * strength);
-        (camera).rotateUp(-data.delta.y * strength);
-    };
-}
 
-void keyboardEvent(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& mvtStrength)
-{
+    /*Mouse mouvement*/
+    ctx.mouse_moved = [&](p6::MouseMove data) {
+        (camera).rotateLeft(data.delta.x * rotationStrength);
+        (camera).rotateUp(-data.delta.y * rotationStrength);
+    };
+
+    /*Keyboard movement*/
     ctx.key_repeated = [&](const p6::Key& data) {
         if (data.logical == "z" || data.logical == "Z")
         {
@@ -60,12 +60,7 @@ int main()
 
     /*Test Camera Third person*/
 
-    // not working
-    Input input(camera, movementStrength);
-
-    mouseEvent(ctx, camera, rotationStrength);
-    keyboardEvent(ctx, camera, movementStrength);
-
+    eventHandler(ctx, camera, movementStrength, rotationStrength);
     // ctx.mouse_dragged = [&camera, &rotationStrength](p6::MouseDrag data) {
     //     data.delta = data.position - data.start_position;
 
