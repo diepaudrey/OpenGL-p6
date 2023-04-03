@@ -14,12 +14,12 @@
 #include "input.hpp"
 #include "p6/p6.h"
 
-void mouseEvent(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& mvtStrength)
+void mouseEvent(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& strength)
 {
-    ctx.mouse_dragged = [&](p6::MouseDrag data) {
-        data.delta = data.position - data.start_position;
-        (camera).rotateLeft(data.delta.x * mvtStrength);
-        (camera).rotateUp(-data.delta.y * mvtStrength);
+    glfwSetInputMode(ctx.underlying_glfw_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    ctx.mouse_moved = [&](p6::MouseMove data) {
+        (camera).rotateLeft(data.delta.x * strength);
+        (camera).rotateUp(-data.delta.y * strength);
     };
 }
 
@@ -56,10 +56,9 @@ int main()
     // glimac::TrackballCamera camera;
     glimac::FreeflyCamera camera;
     float                 movementStrength = 10.f;
-    float                 rotationStrength = 20.f;
+    float                 rotationStrength = 900.f;
 
     /*Test Camera Third person*/
-    // glfwSetInputMode(ctx.underlying_glfw_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // not working
     Input input(camera, movementStrength);
@@ -148,9 +147,6 @@ int main()
     // Declare your infinite update loop.
     ctx.update = [&]() {
         /*Events*/
-
-        std::cout << camera.m_theta << std::endl;
-        std::cout << camera.m_phi << std::endl;
 
         glm::mat4 viewMatrix   = camera.getViewMatrix();
         glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
