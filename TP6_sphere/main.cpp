@@ -14,37 +14,34 @@
 #include "input.hpp"
 #include "p6/p6.h"
 
-void eventHandler(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& mvtStrength, const float& rotationStrength)
+void mouseHandler(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& rotationStrength)
 {
     glfwSetInputMode(ctx.underlying_glfw_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    /*Mouse mouvement*/
     ctx.mouse_moved = [&](p6::MouseMove data) {
         (camera).rotateLeft(data.delta.x * rotationStrength);
         (camera).rotateUp(-data.delta.y * rotationStrength);
     };
+}
 
-    /*Keyboard movement*/
-    ctx.key_repeated = [&](const p6::Key& data) {
-        if (data.logical == "z" || data.logical == "Z")
-        {
-            camera.moveFront(ctx.delta_time() * mvtStrength);
-        }
-
-        if (data.logical == "s" || data.logical == "S")
-        {
-            camera.moveFront(-ctx.delta_time() * mvtStrength);
-        }
-        if (data.logical == "q" || data.logical == "Q")
-        {
-            camera.moveLeft(ctx.delta_time() * mvtStrength);
-        }
-
-        if (data.logical == "d" || data.logical == "D")
-        {
-            camera.moveLeft(-ctx.delta_time() * mvtStrength);
-        }
+void keyboardHandler(p6::Context& ctx, glimac::FreeflyCamera& camera, const float& mvtStrength)
+{
+    if (ctx.key_is_pressed(GLFW_KEY_W))
+    {
+        camera.moveFront(ctx.delta_time() * mvtStrength);
     };
+    if (ctx.key_is_pressed(GLFW_KEY_S))
+    {
+        camera.moveFront(-ctx.delta_time() * mvtStrength);
+    }
+    if (ctx.key_is_pressed(GLFW_KEY_A))
+    {
+        camera.moveLeft(ctx.delta_time() * mvtStrength);
+    }
+    if (ctx.key_is_pressed(GLFW_KEY_D))
+    {
+        camera.moveLeft(-ctx.delta_time() * mvtStrength);
+    }
 }
 
 int main()
@@ -55,44 +52,10 @@ int main()
     /*Camera*/
     // glimac::TrackballCamera camera;
     glimac::FreeflyCamera camera;
-    float                 movementStrength = 10.f;
+    float                 movementStrength = 5.f;
     float                 rotationStrength = 900.f;
 
-    /*Test Camera Third person*/
-
-    eventHandler(ctx, camera, movementStrength, rotationStrength);
-    // ctx.mouse_dragged = [&camera, &rotationStrength](p6::MouseDrag data) {
-    //     data.delta = data.position - data.start_position;
-
-    //     camera.rotateLeft(data.delta.x * rotationStrength);
-    //     camera.rotateUp(data.delta.y * rotationStrength);
-    // };
-
-    // ctx.mouse_scrolled = [&camera](p6::MouseScroll data) {
-    //     camera.moveFront(data.dy);
-    // };
-
-    // ctx.key_repeated = [&camera, &ctx, &movementStrength](const p6::Key& data) {
-    //     if (data.logical == "z" || data.logical == "Z")
-    //     {
-    //         camera.moveFront(ctx.delta_time() * movementStrength);
-    //     }
-
-    //     if (data.logical == "s" || data.logical == "S")
-    //     {
-    //         camera.moveFront(-ctx.delta_time() * movementStrength);
-    //     }
-
-    //     if (data.logical == "q" || data.logical == "Q")
-    //     {
-    //         camera.moveLeft(ctx.delta_time() * movementStrength);
-    //     }
-
-    //     if (data.logical == "d" || data.logical == "D")
-    //     {
-    //         camera.moveLeft(-ctx.delta_time() * movementStrength);
-    //     }
-    // };
+    mouseHandler(ctx, camera, rotationStrength);
 
     /*VBO*/
     GLuint vbo;
@@ -139,9 +102,11 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
+    mouseHandler(ctx, camera, rotationStrength);
     // Declare your infinite update loop.
     ctx.update = [&]() {
         /*Events*/
+        keyboardHandler(ctx, camera, movementStrength);
 
         glm::mat4 viewMatrix   = camera.getViewMatrix();
         glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
